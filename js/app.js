@@ -1,4 +1,3 @@
-//import { UI } from "./clases";
 //Declaracion de constantes
 
 ///campos form
@@ -16,6 +15,11 @@ const contieneReservas = document.querySelector('#reservas');
 class Reservas {
     constructor(){
         this.reserva = [];
+    }
+
+    agregarReserva(reserva){
+        this.reserva = [...this.reserva, reserva]
+        console.log(this.reserva)
     }
 }
 
@@ -44,6 +48,27 @@ class UI {
         setTimeout(() =>{
             divMensaje.remove();
         }, 5000);
+    }
+
+    imprimirReservas({ reserva }){ //desestructuracion para acceder al arreglo
+        
+        reserva.forEach( reserv => {
+            const { nombre, cantidad, telefono, fecha, hora, id } = reserv;
+
+            const divRes = document.createElement('div');
+            divRes.classList.add('reserva', 'p-3');
+            divRes.dataset.id = id;
+
+            //
+            const nombreP = document.createElement('h2');
+            nombreP.classList.add('card-title', 'font-weight-bolder');
+            nombreP.textContent = nombre;
+
+            //agregar al html
+            divRes.appendChild(nombreP)
+            contieneReservas.appendChild(divRes);
+        })
+
     }
 }
 
@@ -91,6 +116,24 @@ function nuevaReserva(e) {
         ui.imprimirAlerta('Todos los campos son obligatorios', 'error');
         return;
     }
+
+    //generar ID unico para cada reserva
+    reservaObj.id = Date.now();
+
+    //crear reserva
+    adReserva.agregarReserva({...reservaObj});
+    reiniciarObj();
+
+    formulario.reset();
+
+    ui.imprimirReservas(adReserva);
 }
 
-//
+//reiniciar objeto
+function reiniciarObj() {
+    reservaObj.nombre= '';
+    reservaObj.cantidad= '';
+    reservaObj.telefono= '';
+    reservaObj.fecha= '';
+    reservaObj.hora= '';
+}
