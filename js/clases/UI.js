@@ -1,3 +1,7 @@
+const contieneReservas = document.querySelector('#reservas');
+
+import { eliminarReserva } from "../Funciones/funciones.js";
+
 export default class UI {
     imprimirAlerta(mensaje, tipo){
         //formateo de alerta
@@ -88,3 +92,4 @@ export default class UI {
         }
     }
 }
+
