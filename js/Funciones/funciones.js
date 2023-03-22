@@ -1,10 +1,4 @@
-const nombreInput = document.querySelector('#nombre');
-const cantidadInput = document.querySelector('#cantidad');
-const telefonoInput = document.querySelector('#telefono');
-const fechaInput = document.querySelector('#fecha');
-const horaInput = document.querySelector('#hora');
-const formulario = document.querySelector('#nueva-reserva');
-
+import { formulario } from "./selectores.js";
 //Clases
 import Reservas from "../clases/Reservas.js";
 import UI from "../clases/UI.js";
@@ -12,17 +6,9 @@ import UI from "../clases/UI.js";
 const ui = new UI();
 const adReserva = new Reservas();
 
-//Funciones
+let DB;
 
-export function eventListeners() {
-    nombreInput.addEventListener('change',datosReserva);
-    cantidadInput.addEventListener('change',datosReserva);
-    telefonoInput.addEventListener('change',datosReserva);
-    fechaInput.addEventListener('change',datosReserva);
-    horaInput.addEventListener('change',datosReserva);
-    
-    formulario.addEventListener('submit', nuevaReserva);
-}
+//Funciones
 
 //Objeto con los datos de la reserva
 const reservaObj = {
@@ -33,14 +19,14 @@ const reservaObj = {
     hora: ''
 }
 
-function datosReserva(e) {
+export function datosReserva(e) {
     //guardar texto en objeto
     reservaObj[e.target.name] = e.target.value;
     //console.log(reservaObj)
 }
 
 //Validar y Agregar nueca reserva
-function nuevaReserva(e) {
+export function nuevaReserva(e) {
     e.preventDefault();
     
     //extraer datos
@@ -57,6 +43,19 @@ function nuevaReserva(e) {
 
     //crear reserva
     adReserva.agregarReserva({...reservaObj});
+
+    //agregar registr a bbdd
+    const transaction = DB.transaction(['reservas'], 'readwrite');
+    //habilitar el objectstore
+    const objectStore = transaction.objectStore('reservas');
+    //insertar
+    objectStore.add(reservaObj);
+    
+    transaction.oncomplete = function () {
+        console.log('reserva agregada');
+        ui.imprimirAlerta('Reserva agregada');
+    }
+
     reiniciarObj();
 
     formulario.reset();
@@ -83,5 +82,41 @@ export function eliminarReserva(id) {
 
     //refrescar (volver a pasar objetos)
     ui.imprimirReservas(adReserva)
+
+}
+
+export function crearDB() {
+    const crearDB = window.indexedDB.open('reservas', 1);
+
+    //error
+    crearDB.onerror = function () {
+        console.log('Hubo un error al crear la BBDD');
+    }
+
+    //todo bien
+    crearDB.onsuccess = ()=>{
+        console.log('BBDD creada')
+        DB = crearDB.result;
+    }
+
+    //definir schema
+    crearDB.onupgradeneeded = function (e) {
+        const db = e.target.result;
+
+        const objectStore = db.createObjectStore('reservas',{
+            keyPath: 'id',
+            autoIncrement: true
+        })
+
+        //Definir columnas
+        objectStore.createIndex('nombre', 'nombre', {unique: false});
+        objectStore.createIndex('cantidad', 'cantidad', {unique: false});
+        objectStore.createIndex('telefono', 'telefono', {unique: false});
+        objectStore.createIndex('fecha', 'fecha', {unique: false});
+        objectStore.createIndex('hora', 'hora', {unique: false});
+        objectStore.createIndex('id', 'id', {unique: true});
+
+
+    }
 
 }

@@ -1,6 +1,5 @@
-const contieneReservas = document.querySelector('#reservas');
-
 import { eliminarReserva } from "../Funciones/funciones.js";
+import { contieneReservas } from "../Funciones/selectores.js";
 
 export default class UI {
     imprimirAlerta(mensaje, tipo){
