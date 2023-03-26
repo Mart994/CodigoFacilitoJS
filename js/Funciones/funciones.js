@@ -9,7 +9,7 @@ const adReserva = new Reservas();
 let DB;
 
 //Funciones
-
+ui.imprimirReservas();
 //Objeto con los datos de la reserva
 const reservaObj = {
     nombre: '',
@@ -60,7 +60,7 @@ export function nuevaReserva(e) {
 
     formulario.reset();
 
-    ui.imprimirReservas(adReserva);
+    ui.imprimirReservas();
 }
 
 //reiniciar objeto
@@ -81,26 +81,27 @@ export function eliminarReserva(id) {
     ui.imprimirAlerta('Reserva eliminada correctamente', 'exito');
 
     //refrescar (volver a pasar objetos)
-    ui.imprimirReservas(adReserva)
+    ui.imprimirReservas()
 
 }
 
 export function crearDB() {
-    const crearDB = window.indexedDB.open('reservas', 1);
+    const dataBase = window.indexedDB.open('reservas', 1);
 
     //error
-    crearDB.onerror = function () {
+    dataBase.onerror = function () {
         console.log('Hubo un error al crear la BBDD');
     }
 
     //todo bien
-    crearDB.onsuccess = ()=>{
+    dataBase.onsuccess = ()=>{
         console.log('BBDD creada')
-        DB = crearDB.result;
+        DB = dataBase.result;
+        
     }
 
     //definir schema
-    crearDB.onupgradeneeded = function (e) {
+    dataBase.onupgradeneeded = function (e) {
         const db = e.target.result;
 
         const objectStore = db.createObjectStore('reservas',{

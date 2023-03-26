@@ -1,6 +1,9 @@
 import { eliminarReserva } from "../Funciones/funciones.js";
 import { contieneReservas } from "../Funciones/selectores.js";
 
+let DB;
+
+
 export default class UI {
     imprimirAlerta(mensaje, tipo){
         //formateo de alerta
@@ -28,12 +31,18 @@ export default class UI {
         }, 5000);
     }
 
-    imprimirReservas({ reserva }){ //desestructuracion para acceder al arreglo
+    imprimirReservas(  ){ 
         
         this.limpiarHTML();
 
-        reserva.forEach( reserv => {
-            const { nombre, cantidad, telefono, fecha, hora, id } = reserv;
+        //leer desde la BBDD
+        const objectStore = DB.transaction('reservas').objectStore('resrvas');
+
+        objectStore.openCursor().onsuccess = function(e){
+            const cursor = e.target.result;
+
+            if (cursor){
+                const { nombre, cantidad, telefono, fecha, hora, id } = reserv;
 
             const divRes = document.createElement('div');
             divRes.classList.add('reserva', 'p-3');
@@ -81,7 +90,10 @@ export default class UI {
             divRes.appendChild(horaP);
             divRes.appendChild(btnEliminar);
             contieneReservas.appendChild(divRes);
-        })
+
+            cursor.continue();
+            }
+        }
 
     }
 
