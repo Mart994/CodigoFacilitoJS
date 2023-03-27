@@ -9,8 +9,17 @@ export default class Reservas {
     }
 
     eliminarReserva(id){
+        //filter elimina un elemento segun una condicion
         this.reserva=this.reserva.filter(
             reserva => reserva.id !== id
         );
+    }
+
+    editarReserva(reservaActualizada){
+        //map nos crea un nuevo arreglo
+        //se busca la igualdad, en caso de cumplir se reescribe todo el objeto
+        this.reserva = this.reserva.map( 
+            reserva => reserva.id === reservaActualizada.id ? reservaActualizada : reserva
+         )
     }
 }
